@@ -1,0 +1,32 @@
+# dependências
+node_modules/
+
+# ─env vars
+.env
+.env.local
+.env.development
+.env.production
+
+# next.js
+.next/
+out/
+
+# bui
+dist/
+build/
+
+# logs
+*.log
+npm-debug.log*
+
+# sistema operacional
+.DS_Store
+Thumbs.db
+
+# editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
