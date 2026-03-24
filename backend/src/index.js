@@ -10,6 +10,7 @@ app.use(express.json());
 
 // rotas
 app.use('/auth', require('./routes/auth'));
+app.use('/turmas', require('./routes/turmas'));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend rodando na porta ${PORT}`));
