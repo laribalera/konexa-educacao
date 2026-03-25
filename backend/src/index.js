@@ -11,7 +11,11 @@ app.use(express.json());
 // rotas
 app.use('/auth', require('./routes/auth'));
 app.use('/turmas', require('./routes/turmas'));
+app.use('/turmas', require('./routes/notas'));
+app.use('/notas', require('./routes/notas'));
+app.use('/alunos', require('./routes/notas'));
 app.use('/mensagens', require('./routes/mensagens'));
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend rodando na porta ${PORT}`));
