@@ -10,11 +10,19 @@ app.use(express.json());
 
 // rotas
 app.use('/auth', require('./routes/auth'));
+
 app.use('/turmas', require('./routes/turmas'));
 app.use('/turmas', require('./routes/notas'));
+
 app.use('/notas', require('./routes/notas'));
 app.use('/alunos', require('./routes/notas'));
+
 app.use('/mensagens', require('./routes/mensagens'));
+
+app.use('/turmas', require('./routes/materiais'));
+
+app.use('/aulas', require('./routes/aulas'));
+app.use('/presencas', require('./routes/presencas'));
 
 
 const PORT = process.env.PORT || 3001;
