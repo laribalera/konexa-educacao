@@ -11,12 +11,10 @@ export default function Layout({ children }) {
 
     const navProf = [
         { label: 'Turmas', path: '/dashboard', icon: <IconTurmas /> },
-        { label: 'Diário de classe', path: '/diario', icon: <IconDiario /> },
     ];
 
     const navAluno = [
         { label: 'Minhas turmas', path: '/aluno/dashboard', icon: <IconTurmas /> },
-        { label: 'Anotações', path: '/aluno/anotacoes', icon: <IconAnotacoes /> },
     ];
 
     const nav = user?.role === 'professor' ? navProf : navAluno;
