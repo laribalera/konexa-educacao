@@ -28,5 +28,7 @@ app.use('/anotacoes', require('./routes/anotacoes')); // CRUD de anotações (al
 
 app.use('/diario', require('./routes/diario')); // CRUD de diário de turma (professores podem criar/editar/deletar entradas)
 
+app.use('/avisos', require('./routes/avisos')); // CRUD de avisos dentro de turmas (professores podem criar, alunos podem ver e reagir)
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend rodando na porta ${PORT}`));
