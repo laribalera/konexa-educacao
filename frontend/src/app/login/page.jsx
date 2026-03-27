@@ -40,87 +40,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #FFF0EC 0%, #FDE8F0 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-    }}>
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+    <div style={styles.page}>
+      <div style={styles.container}>
 
         {/* logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-
-          {/* logo dentro da div */}
-          <div style={{
-            width: '56px',
-            height: '56px',
-            background: 'linear-gradient(135deg, #E8490F, #C2185B)',
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 14px',
-          }}>
+        <div style={styles.logoWrapper}>
+          <div style={styles.logoBox}>
             <IconLogo />
           </div>
 
-          {/* titulo */}
-          <h1 style={{
-            fontSize: '26px',
-            fontWeight: '800',
-            margin: '0',
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '-.02em',
-          }}>
-            Konexa Educação
-          </h1>
+          <h1 style={styles.title}>Konexa</h1>
 
-          {/* subtitulo */}
-          <p style={{
-            fontSize: '14px',
-            color: '#666',
-            marginTop: '6px'
-          }}>
+          <p style={styles.subtitle}>
             Conectando o conhecimento
           </p>
-
         </div>
 
-        {/* card de login */}
-        <div style={{
-          background: '#fff',
-          border: '1px solid var(--gray-200)',
-          borderRadius: 'var(--radius-xl)',
-          padding: '28px',
-        }}>
-          {/* toggle logi<>cadastro */}
-          <div style={{
-            display: 'flex',
-            background: 'var(--gray-100)',
-            borderRadius: '10px',
-            padding: '4px',
-            marginBottom: '24px',
-          }}>
+        {/* card */}
+        <div style={styles.card}>
+
+          {/* toggle */}
+          <div style={styles.toggle}>
             {['login', 'cadastro'].map((m) => (
               <button
                 key={m}
                 onClick={() => { setModo(m); setErro(''); }}
                 style={{
-                  flex: 1,
-                  padding: '8px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '13px',
-                  fontWeight: modo === m ? '600' : '500',
-                  color: modo === m ? 'var(--gray-900)' : 'var(--gray-400)',
-                  background: modo === m ? '#fff' : 'transparent',
-                  boxShadow: modo === m ? '0 1px 3px rgba(0,0,0,.08)' : 'none',
-                  transition: 'all .15s',
+                  ...styles.toggleButton,
+                  ...(modo === m ? styles.toggleButtonActive : {}),
                 }}
               >
                 {m === 'login' ? 'Entrar' : 'Cadastrar'}
@@ -129,11 +76,11 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={styles.form}>
 
               {modo === 'cadastro' && (
                 <div>
-                  <label style={labelStyle}>Nome completo</label>
+                  <label style={styles.label}>Nome completo</label>
                   <input
                     name="nome"
                     type="text"
@@ -141,13 +88,13 @@ export default function LoginPage() {
                     value={form.nome}
                     onChange={handleChange}
                     required
-                    style={inputStyle}
+                    style={styles.input}
                   />
                 </div>
               )}
 
               <div>
-                <label style={labelStyle}>E-mail</label>
+                <label style={styles.label}>E-mail</label>
                 <input
                   name="email"
                   type="email"
@@ -155,12 +102,12 @@ export default function LoginPage() {
                   value={form.email}
                   onChange={handleChange}
                   required
-                  style={inputStyle}
+                  style={styles.input}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>Senha</label>
+                <label style={styles.label}>Senha</label>
                 <input
                   name="senha"
                   type="password"
@@ -168,18 +115,18 @@ export default function LoginPage() {
                   value={form.senha}
                   onChange={handleChange}
                   required
-                  style={inputStyle}
+                  style={styles.input}
                 />
               </div>
 
               {modo === 'cadastro' && (
                 <div>
-                  <label style={labelStyle}>Sou</label>
+                  <label style={styles.label}>Sou</label>
                   <select
                     name="role"
                     value={form.role}
                     onChange={handleChange}
-                    style={inputStyle}
+                    style={styles.input}
                   >
                     <option value="professor">Professor</option>
                     <option value="aluno">Aluno</option>
@@ -188,14 +135,7 @@ export default function LoginPage() {
               )}
 
               {erro && (
-                <div style={{
-                  background: 'var(--red-light)',
-                  border: '1px solid var(--red-mid)',
-                  borderRadius: 'var(--radius)',
-                  padding: '10px 12px',
-                  fontSize: '13px',
-                  color: 'var(--red)',
-                }}>
+                <div style={styles.error}>
                   {erro}
                 </div>
               )}
@@ -204,21 +144,15 @@ export default function LoginPage() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  width: '100%',
-                  padding: '11px',
-                  background: loading ? 'var(--gray-200)' : 'linear-gradient(135deg, #E8490F, #C2185B)',
-                  color: loading ? 'var(--gray-400)' : '#fff',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  marginTop: '4px',
-                  transition: 'opacity .15s',
+                  ...styles.button,
+                  ...(loading ? styles.buttonDisabled : {}),
                 }}
               >
-                {loading ? 'Aguarde...' : modo === 'login' ? 'Entrar na plataforma' : 'Criar conta'}
+                {loading
+                  ? 'Aguarde...'
+                  : modo === 'login'
+                    ? 'Entrar'
+                    : 'Criar conta'}
               </button>
 
             </div>
@@ -240,22 +174,125 @@ function IconLogo() {
   );
 }
 
-const labelStyle = {
-  display: 'block',
-  fontSize: '12px',
-  fontWeight: '500',
-  color: 'var(--gray-700)',
-  marginBottom: '5px',
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '9px 12px',
-  border: '1px solid var(--gray-200)',
-  borderRadius: 'var(--radius)',
-  fontSize: '13px',
-  color: 'var(--gray-900)',
-  background: '#fff',
-  outline: 'none',
-  fontFamily: 'var(--font-body)',
+const styles = {
+  page: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #FFF0EC 0%, #FDE8F0 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px',
+  },
+  container: {
+    width: '100%',
+    maxWidth: '400px',
+  },
+  logoWrapper: {
+    textAlign: 'center',
+    marginBottom: '32px',
+  },
+  logoBox: {
+    width: '56px',
+    height: '56px',
+    background: 'linear-gradient(135deg, #E8490F, #C2185B)',
+    borderRadius: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 14px',
+  },
+  title: {
+    fontSize: '26px',
+    fontWeight: '800',
+    margin: 0,
+    fontFamily: 'var(--font-heading)',
+    letterSpacing: '-.02em',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#666',
+    marginTop: '6px',
+  },
+  card: {
+    background: '#fff',
+    border: '1px solid var(--gray-200)',
+    borderRadius: 'var(--radius-xl)',
+    padding: '28px',
+  },
+  toggle: {
+    display: 'flex',
+    background: 'var(--gray-100)',
+    borderRadius: '10px',
+    padding: '4px',
+    marginBottom: '24px',
+  },
+  toggleButton: {
+    flex: 1,
+    padding: '8px',
+    borderRadius: '7px',
+    border: 'none',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-body)',
+    fontSize: '13px',
+    fontWeight: '500',
+    color: 'var(--gray-400)',
+    background: 'transparent',
+    transition: 'all .15s',
+  },
+  toggleButtonActive: {
+    fontWeight: '600',
+    color: 'var(--gray-900)',
+    background: '#fff',
+    boxShadow: '0 1px 3px rgba(0,0,0,.08)',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px',
+  },
+  label: {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: 'var(--gray-700)',
+    marginBottom: '5px',
+  },
+  input: {
+    width: '100%',
+    padding: '9px 12px',
+    border: '1px solid var(--gray-200)',
+    borderRadius: 'var(--radius)',
+    fontSize: '13px',
+    color: 'var(--gray-900)',
+    background: '#fff',
+    outline: 'none',
+    fontFamily: 'var(--font-body)',
+  },
+  error: {
+    background: 'var(--red-light)',
+    border: '1px solid var(--red-mid)',
+    borderRadius: 'var(--radius)',
+    padding: '10px 12px',
+    fontSize: '13px',
+    color: 'var(--red)',
+  },
+  button: {
+    width: '100%',
+    padding: '11px',
+    background: 'linear-gradient(135deg, #E8490F, #C2185B)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 'var(--radius)',
+    fontFamily: 'var(--font-body)',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    marginTop: '4px',
+    transition: 'opacity .15s',
+  },
+  buttonDisabled: {
+    background: 'var(--gray-200)',
+    color: 'var(--gray-400)',
+    cursor: 'not-allowed',
+  },
 };

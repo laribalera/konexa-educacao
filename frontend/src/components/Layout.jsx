@@ -25,7 +25,7 @@ export default function Layout({ children }) {
             {/* Sidebar */}
             <div style={{
                 width: '220px',
-                background: 'linear-gradient(135deg, #cf9d8b, #C2185B)',
+                background: 'linear-gradient(135deg, #C2185B, #cf9d8b)',
                 display: 'flex',
                 flexDirection: 'column',
                 flexShrink: 0,
@@ -44,9 +44,8 @@ export default function Layout({ children }) {
                             fontFamily: 'var(--font-heading)',
                             fontSize: '16px',
                             fontWeight: '800',
-                            background: 'linear-gradient(135deg, #E8490F, #C2185B)',
+                            color: '#eeecec',
                             WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
                         }}>Konexa</div>
                         <div style={{ fontSize: '11px', color: '#eeecec' }}>Educação</div>
                     </div>
@@ -71,7 +70,7 @@ export default function Layout({ children }) {
                                     fontFamily: 'var(--font-body)',
                                     fontSize: '13px',
                                     fontWeight: '500',
-                                    color: active ? '#fff' : '#5e5958',
+                                    color: active ? '#fff' : '#eeecec',
                                     background: active ? 'linear-gradient(135deg, #E8490F, #C2185B)' : 'transparent',
                                     width: '100%',
                                     textAlign: 'left',
