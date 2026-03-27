@@ -62,3 +62,42 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+/*reactions*/
+
+.reaction {
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  transition: 0.15s;
+}
+
+.reaction:hover {
+  background: var(--gray-100);
+}
+
+/* tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 10px 20px;
+}
+
+.tab {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gray-500);
+}
+
+.tab.active {
+  background: var(--grad);
+  color: #fff;
+}
