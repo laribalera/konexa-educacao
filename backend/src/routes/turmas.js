@@ -44,9 +44,12 @@ router.get('/', auth, async (req, res) => {
             ));
         } else {
             ({ rows } = await db.query(
-                `SELECT t.*
+                `SELECT 
+                    t.*,
+                    u.nome AS nome_professor
                 FROM public.turmas t
                 INNER JOIN public.turma_alunos ta ON ta.turma_id = t.id
+                INNER JOIN public.users u ON u.id = t.professor_id
                 WHERE ta.aluno_id = $1
                 ORDER BY ta.matriculado_em DESC`,
                 [req.user.id]
@@ -131,11 +134,17 @@ router.get('/:id/alunos', auth, async (req, res) => {
         }
 
         const { rows } = await db.query(
-            `SELECT u.id, u.nome, u.email, ta.matriculado_em
-       FROM public.users u
-       INNER JOIN public.turma_alunos ta ON ta.aluno_id = u.id
-       WHERE ta.turma_id = $1
-       ORDER BY u.nome ASC`,
+            `WITH professor AS (
+                SELECT p.id, p.nome AS nome_professor
+                FROM public.users p
+                WHERE role = 'professor' AND p.id = (SELECT professor_id FROM public.turmas WHERE id = $1)
+            )
+            SELECT u.id, u.nome, u.email, ta.matriculado_em, professor.nome_professor
+            FROM public.users u
+            INNER JOIN public.turma_alunos ta ON ta.aluno_id = u.id
+            CROSS JOIN professor
+            WHERE ta.turma_id = $1
+            ORDER BY u.nome ASC`,
             [id]
         );
 
@@ -143,6 +152,50 @@ router.get('/:id/alunos', auth, async (req, res) => {
     } catch (error) {
         console.error('Erro ao listar alunos:', error);
         return res.status(500).json({ error: 'Erro interno no servidor' });
+    }
+});
+
+// DELETE: /turmas/:id/alunos/:alunoId - remover aluno da turma
+
+router.delete('/:id/alunos/:alunoId', auth, async (req, res) => {
+    const { id, alunoId } = req.params;
+
+    if (req.user.role !== 'professor') {
+        return res.status(403).json({ error: 'Acesso negado: apenas professores' });
+    }
+
+    try {
+        // verifica se o profe é dono da turma
+        const { rows: turma } = await db.query(
+            'SELECT 1 FROM public.turmas WHERE id = $1 AND professor_id = $2',
+            [id, req.user.id]
+        );
+
+        if (turma.length === 0) {
+            return res.status(403).json({ error: 'Acesso negado: você não é dono da turma' });
+        }
+
+        // verifica se o aluno ta na turma
+        const { rows: matricula } = await db.query(
+            'SELECT 1 FROM public.turma_alunos WHERE turma_id = $1 AND aluno_id = $2',
+            [id, alunoId]
+        );
+
+        if (matricula.length === 0) {
+            return res.status(404).json({ error: 'Aluno não está matriculado nesta turma' });
+        }
+
+        // remove o aluno
+        await db.query(
+            'DELETE FROM public.turma_alunos WHERE turma_id = $1 AND aluno_id = $2',
+            [id, alunoId]
+        );
+
+        return res.json({ message: 'Aluno removido com sucesso' });
+
+    } catch (error) {
+        console.error('Erro ao remover aluno:', error);
+        return res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
 
