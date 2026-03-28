@@ -7,6 +7,9 @@ import { api } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import MateriaisPage from './materiais/page';
+import NotasTab from '@/components/NotasTab/NotasTab';
+import DesempenhoTab from '@/components/DesempenhoTab/DesempenhoTab';
+import ChamadaTab from '@/components/ChamadaTab/ChamadaTab';
 
 export default function TurmaPage() {
     return (
@@ -59,7 +62,10 @@ function Turma() {
 
                 {/*apenas alunos*/}
                 {user?.role === 'aluno' && (
-                    <Tab label="Anotações" value="anotacoes" {...{ abaAtiva, setAbaAtiva }} />
+                    <>
+                        <Tab label="Desempenho" value="desempenho" {...{ abaAtiva, setAbaAtiva }} />
+                        <Tab label="Anotações" value="anotacoes" {...{ abaAtiva, setAbaAtiva }} />
+                    </>
                 )}
 
                 {/*apenas profs*/}
@@ -77,8 +83,10 @@ function Turma() {
                 {abaAtiva === 'home' && <HomeTab turmaId={id} user={user} />}
                 {abaAtiva === 'alunos' && <AlunosTab turmaId={id} user={user} />}
                 {abaAtiva === 'materiais' && <MateriaisPage params={{ id: turma?.id }} />}
-                {abaAtiva === 'notas' && <p>Notas (em construção)</p>}
+                {abaAtiva === 'notas' && <NotasTab turmaId={id} user={user} />}
+                {abaAtiva === 'desempenho' && <DesempenhoTab turmaId={id} userId={user?.id} />}
                 {abaAtiva === 'diario' && <p>Diário de Classe (em construção)</p>}
+                {abaAtiva === 'chamada' && <ChamadaTab turmaId={id} />}
             </div>
         </Layout>
     );
@@ -148,9 +156,15 @@ function HomeTab({ turmaId, user }) {
             </div>
 
             {/* avisos */}
-            {avisos.map(aviso => (
-                <AvisoCard key={aviso.id} aviso={aviso} user={user} onRefresh={carregar} />
-            ))}
+            <div style={{ maxHeight: '360px', overflowY: 'auto', display: 'grid', gap: '10px', paddingRight: '4px' }}>
+                {avisos.length === 0 ? (
+                    <p style={{ color: '#aaa', fontSize: '13px', margin: 0 }}>Nenhum aviso publicado ainda.</p>
+                ) : (
+                    avisos.map(aviso => (
+                        <AvisoCard key={aviso.id} aviso={aviso} user={user} onRefresh={carregar} />
+                    ))
+                )}
+            </div>
 
             {/* grid de chat e materiais */}
             <div style={gridInferior}>
@@ -673,7 +687,7 @@ const gridInferior = {
 };
 
 const chatBox = {
-    maxHeight: '300px',
+    maxHeight: '340px',
     overflowY: 'auto',
     marginTop: '10px',
     display: 'flex',
