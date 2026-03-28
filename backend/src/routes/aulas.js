@@ -83,4 +83,24 @@ router.post('/:id/chamada', auth, async (req, res) => {
   }
 });
 
+// GET /aulas/:id/presencas — retorna presenças registradas de uma aula
+router.get('/:id/presencas', auth, async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user.role !== 'professor') {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+
+  try {
+    const { rows } = await db.query(
+      `SELECT aluno_id, presente FROM public.presencas WHERE aula_id = $1`,
+      [id]
+    );
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Erro interno' });
+  }
+});
+
 module.exports = router;

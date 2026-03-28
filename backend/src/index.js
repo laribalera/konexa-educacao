@@ -30,5 +30,7 @@ app.use('/diario', require('./routes/diario')); // CRUD de diário de turma (pro
 
 app.use('/avisos', require('./routes/avisos')); // CRUD de avisos dentro de turmas (professores podem criar, alunos podem ver e reagir)
 
+app.use('/turmas', require('./routes/frequencia')); // rota para frequência de alunos dentro de turmas (professores podem ver frequência de todos os alunos, alunos podem ver só a própria frequência)
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend rodando na porta ${PORT}`));
