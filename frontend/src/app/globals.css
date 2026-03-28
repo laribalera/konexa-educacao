@@ -101,3 +101,122 @@ h1, h2, h3, h4 {
   background: var(--grad);
   color: #fff;
 }
+
+/* mobile breakpoint 768px */
+
+/* --- sidebar: some no mobile, controlada por classe .sidebar-open --- */
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  /* sidebar escondida por padrão */
+  [data-sidebar] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  /* sidebar aberta */
+  [data-sidebar].open {
+    transform: translateX(0);
+  }
+
+  /* overlay escurecido atrás da sidebar */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 99;
+  }
+
+  /* botão toggle visível só no mobile */
+  .hamburger {
+    display: flex !important;
+  }
+
+  /* conteúdo principal ocupa tela toda */
+  [data-main] {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  /* abas da turma: scroll horizontal */
+  [data-tabs-bar] {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  [data-tabs-bar]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* modais: tela cheia */
+  [data-modal] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* overlay dos modais: sem padding lateral */
+  [data-overlay] {
+    padding: 0 !important;
+    align-items: flex-end;
+  }
+
+  /* grids de 2+ colunas viram 1 coluna */
+  [data-grid-2] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* tabela de notas: scroll horizontal */
+  [data-table-wrap] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* stats grid: 2 colunas no mobile em vez de 4 */
+  [data-stats-grid] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* padding geral menor */
+  [data-content] {
+    padding: 16px !important;
+  }
+}
+
+/* toggle e topbar mobile: escondidos no desktop */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #333;
+}
+
+.mobile-topbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-topbar {
+    display: flex;
+  }
+}

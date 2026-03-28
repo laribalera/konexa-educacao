@@ -1,13 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
+import '@/app/globals.css'
 
 export default function Layout({ children }) {
     const { user, logout } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const navProf = [
         { label: 'Turmas', path: '/dashboard', icon: <IconTurmas /> },
@@ -19,11 +22,21 @@ export default function Layout({ children }) {
 
     const nav = user?.role === 'professor' ? navProf : navAluno;
 
+    function fecharSidebar() { setSidebarOpen(false); }
+
     return (
         <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
 
+            {/* overlay mobile */}
+            {sidebarOpen && (
+                <div className="sidebar-overlay" onClick={fecharSidebar} />
+            )}
+
             {/* Sidebar */}
-            <div style={{
+            <div
+                data-sidebar
+                className={sidebarOpen ? 'open' : ''}
+                style={{
                 width: '220px',
                 background: 'linear-gradient(135deg, #C2185B, #cf9d8b)',
                 display: 'flex',
@@ -58,7 +71,7 @@ export default function Layout({ children }) {
                         return (
                             <button
                                 key={item.path}
-                                onClick={() => router.push(item.path)}
+                                onClick={() => { router.push(item.path); fecharSidebar(); }}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -121,7 +134,22 @@ export default function Layout({ children }) {
             </div>
 
             {/* Main */}
-            <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <div data-main style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+                {/* topbar mobile com toggle */}
+                <div style={{
+                    alignItems: 'center', gap: '12px',
+                    padding: '10px 16px', background: '#fff',
+                    borderBottom: '1px solid #eee',
+                }} className="mobile-topbar">
+                    <button className="hamburger" onClick={() => setSidebarOpen(o => !o)}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <span style={{ fontFamily: 'var(--font-heading)', fontWeight: '700', fontSize: '15px' }}>Konexa</span>
+                </div>
                 {children}
             </div>
 
