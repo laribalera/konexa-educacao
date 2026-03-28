@@ -10,6 +10,8 @@ import MateriaisPage from './materiais/page';
 import NotasTab from '@/components/NotasTab/NotasTab';
 import DesempenhoTab from '@/components/DesempenhoTab/DesempenhoTab';
 import ChamadaTab from '@/components/ChamadaTab/ChamadaTab';
+import DiarioTab from '@/components/DiarioTab/DiarioTab';
+import AnotacoesTab from '@/components/AnotacoesTab/AnotacoesTab';
 
 export default function TurmaPage() {
     return (
@@ -58,7 +60,6 @@ function Turma() {
                 <Tab label="Home" value="home" {...{ abaAtiva, setAbaAtiva }} />
                 <Tab label="Alunos" value="alunos" {...{ abaAtiva, setAbaAtiva }} />
                 <Tab label="Materiais" value="materiais" {...{ abaAtiva, setAbaAtiva }} />
-                <Tab label="Notas" value="notas" {...{ abaAtiva, setAbaAtiva }} />
 
                 {/*apenas alunos*/}
                 {user?.role === 'aluno' && (
@@ -73,6 +74,7 @@ function Turma() {
                     <>
                         <Tab label="Diário de Classe" value="diario" {...{ abaAtiva, setAbaAtiva }} />
                         <Tab label="Chamada" value="chamada" {...{ abaAtiva, setAbaAtiva }} />
+                        <Tab label="Notas" value="notas" {...{ abaAtiva, setAbaAtiva }} />
                     </>
                 )}
 
@@ -85,8 +87,9 @@ function Turma() {
                 {abaAtiva === 'materiais' && <MateriaisPage params={{ id: turma?.id }} />}
                 {abaAtiva === 'notas' && <NotasTab turmaId={id} user={user} />}
                 {abaAtiva === 'desempenho' && <DesempenhoTab turmaId={id} userId={user?.id} />}
-                {abaAtiva === 'diario' && <p>Diário de Classe (em construção)</p>}
+                {abaAtiva === 'diario' && <DiarioTab turmaId={id} />}
                 {abaAtiva === 'chamada' && <ChamadaTab turmaId={id} />}
+                {abaAtiva === 'anotacoes' && <AnotacoesTab turmaId={id} />}
             </div>
         </Layout>
     );
@@ -624,7 +627,7 @@ const card = { background: '#fff', padding: '16px', borderRadius: '12px', border
 const tituloAviso = { fontWeight: '700', fontSize: '16px', marginBottom: '4px' };
 const meta = { fontSize: '12px', color: '#888' };
 
-const cardRow = { display: 'flex', justifyContent: 'spacebetween', padding: '12px', background: '#fff', border: '1px solid #eee', borderRadius: '8px' };
+const cardRow = { display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#fff', border: '1px solid #eee', borderRadius: '8px' };
 const btnRemover = { background: '#fff', color: '#b91c1c', border: 'none', padding: '2px 5px', borderRadius: '6px', cursor: 'pointer' };
 
 const overlay = {

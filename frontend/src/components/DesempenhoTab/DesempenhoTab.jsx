@@ -7,6 +7,7 @@ export default function DesempenhoTab({ turmaId, userId }) {
     const [desempenho, setDesempenho] = useState([]);
     const [frequencia, setFrequencia] = useState(null);
     const [loadingNotas, setLoadingNotas] = useState(true);
+    const [notas, setNotas] = useState([]);
     const [loadingFreq, setLoadingFreq] = useState(true);
 
     useEffect(() => {
@@ -16,10 +17,15 @@ export default function DesempenhoTab({ turmaId, userId }) {
 
     async function carregarNotas() {
         try {
-            const data = await api.get(`/alunos/${userId}/desempenho?turma_id=${turmaId}`);
-            setDesempenho(data || []);
+            const [desempenhoData, notasData] = await Promise.all([
+                api.get(`/alunos/${userId}/desempenho?turma_id=${turmaId}`),
+                api.get(`/notas?turma_id=${turmaId}&aluno_id=${userId}`),
+            ]);
+            setDesempenho(desempenhoData || []);
+            setNotas(notasData || []);
         } catch {
             setDesempenho([]);
+            setNotas([]);
         } finally {
             setLoadingNotas(false);
         }
@@ -188,6 +194,39 @@ export default function DesempenhoTab({ turmaId, userId }) {
                                             Atenção: Desempenho abaixo da média - nota mínima para aprovação: 6.0
                                         </p>
                                     )}
+
+                                    {/* histOrico de provas e atividades */}
+                                    {(() => {
+                                        const notasDisciplina = notas.filter(n => n.disciplina === d.disciplina);
+                                        if (notasDisciplina.length === 0) return null;
+                                        return (
+                                            <div style={{ marginTop: '14px', borderTop: '1px solid #f0f0f0', paddingTop: '12px' }}>
+                                                <p style={{ fontSize: '12px', fontWeight: '600', color: '#555', marginBottom: '8px' }}>
+                                                    Histórico de avaliações
+                                                </p>
+                                                <div style={{ display: 'grid', gap: '6px' }}>
+                                                    {notasDisciplina.map(n => (
+                                                        <div key={n.id} style={historicoRow}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <span style={badgeTipo(n.tipo)}>{n.tipo}</span>
+                                                                <span style={{ fontSize: '13px', color: '#555' }}>
+                                                                    {n.descricao || '—'}
+                                                                </span>
+                                                            </div>
+                                                            <div style={{ textAlign: 'right' }}>
+                                                                <strong style={{ fontSize: '15px', color: notaCor(Number(n.valor)) }}>
+                                                                    {Number(n.valor).toFixed(1)}
+                                                                </strong>
+                                                                <div style={{ fontSize: '10px', color: '#bbb' }}>
+                                                                    {new Date(n.criado_em).toLocaleDateString('pt-BR')}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             );
                         })}
@@ -252,3 +291,11 @@ const miniCard = { background: '#f9f9f9', padding: '10px', borderRadius: '8px' }
 const miniLabel = { fontSize: '11px', color: '#888', marginBottom: '2px' };
 const miniVal = { fontSize: '18px', fontWeight: '700' };
 const miniSub = { fontSize: '11px', color: '#aaa' };
+
+const historicoRow = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#f9f9f9', borderRadius: '8px' };
+const badgeTipo = (tipo) => ({
+    fontSize: '10px', padding: '2px 8px', borderRadius: '12px', fontWeight: '600',
+    background: tipo === 'prova' ? '#ede9fe' : '#e0f2fe',
+    color: tipo === 'prova' ? '#7c3aed' : '#0369a1',
+    whiteSpace: 'nowrap',
+});
