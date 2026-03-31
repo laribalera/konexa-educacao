@@ -62,12 +62,12 @@ router.get('/', auth, async (req, res) => {
         }
 
         const { rows } = await db.query(
-            `SELECT m.id, m.conteudo, m.criado_em,
-              u.id AS autor_id, u.nome AS autor_nome, u.role AS autor_role
-       FROM public.mensagens m
-       INNER JOIN public.users u ON u.id = m.autor_id
-       WHERE m.turma_id = $1
-       ORDER BY m.criado_em ASC`,
+            `SELECT m.id, m.conteudo, m.criado_em - INTERVAL '3 hours' AS criado_em,
+                u.id AS autor_id, u.nome AS autor_nome, u.role AS autor_role
+                FROM public.mensagens m
+                INNER JOIN public.users u ON u.id = m.autor_id
+                WHERE m.turma_id = $1
+            ORDER BY m.criado_em ASC`,
             [turma_id]
         );
 
