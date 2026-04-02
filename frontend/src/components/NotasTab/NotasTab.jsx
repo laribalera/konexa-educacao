@@ -217,13 +217,29 @@ function NotasProfessor({ turmaId }) {
 
 /* modal - configurar disciplinas */
 
+const DISCIPLINAS_DISPONIVEIS = [
+    'Matemática',
+    'Português',
+    'Inglês',
+    'História',
+    'Geografia',
+    'Ciências',
+    'Educação Física',
+    'Arte',
+    'Informática'
+];
+
 function ModalConfigDisciplinas({ turmaId, configs, onClose }) {
     const [cfgs, setCfgs] = useState(configs);
     const [disciplina, setDisciplina] = useState('');
     const [pesoProva, setPesoProva] = useState(6);
     const [pesoAtiv, setPesoAtiv] = useState(4);
+    const [editando, setEditando] = useState(null);
     const [loading, setLoading] = useState(false);
     const [erro, setErro] = useState('');
+
+    const temConfig = cfgs.length > 0;
+    const cfg = cfgs[0];
 
     function handlePesoProva(val) {
         const v = Math.min(10, Math.max(0, Number(val)));
@@ -237,13 +253,11 @@ function ModalConfigDisciplinas({ turmaId, configs, onClose }) {
     }
 
     async function adicionar() {
-        if (!disciplina.trim()) return setErro('Informe o nome da disciplina');
-        const jaExiste = cfgs.some(c => c.disciplina.toLowerCase() === disciplina.trim().toLowerCase());
-        if (jaExiste) return setErro(`"${disciplina.trim()}" já está configurada nesta turma`);
+        if (!disciplina) return setErro('Selecione uma disciplina');
         setErro(''); setLoading(true);
         try {
             const nova = await api.post(`/turmas/${turmaId}/config-notas`, {
-                disciplina: disciplina.trim(),
+                disciplina,
                 peso_prova: Number(pesoProva),
                 peso_atividades: Number(pesoAtiv)
             });
@@ -258,62 +272,144 @@ function ModalConfigDisciplinas({ turmaId, configs, onClose }) {
         }
     }
 
+    async function salvarEdicao() {
+        setErro(''); setLoading(true);
+        try {
+            await api.put(`/turmas/${turmaId}/config-notas/${cfg.disciplina}`, {
+                peso_prova: Number(pesoProva),
+                peso_atividades: Number(pesoAtiv)
+            });
+            setCfgs([{ ...cfg, peso_prova: pesoProva, peso_atividades: pesoAtiv }]);
+            setEditando(null);
+        } catch (e) {
+            setErro(e?.message || 'Erro ao salvar');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function iniciarEdicao() {
+        setPesoProva(cfg.peso_prova);
+        setPesoAtiv(cfg.peso_atividades);
+        setEditando(true);
+        setErro('');
+    }
+
     return (
         <div style={overlay}>
             <div style={{ ...modal, maxWidth: '480px' }}>
                 <h2 style={{ marginBottom: '16px', fontSize: '18px' }}>Configurar disciplinas</h2>
 
-                {cfgs.length > 0 && (
-                    <div style={{ marginBottom: '16px', display: 'grid', gap: '6px' }}>
-                        {cfgs.map(c => (
-                            <div key={c.disciplina} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f9f9f9', borderRadius: '8px', fontSize: '13px' }}>
-                                <strong>{c.disciplina}</strong>
-                                <span style={{ color: '#888' }}>Prova: {c.peso_prova} · Ativ: {c.peso_atividades}</span>
+                {!temConfig ? (
+                    <>
+                        <p style={{ fontSize: '13px', fontWeight: '600', marginBottom: '10px' }}>Selecionar disciplina</p>
+                        
+                        <label style={labelSm}>Disciplina *</label>
+                        <select
+                            value={disciplina}
+                            onChange={e => { setDisciplina(e.target.value); setErro(''); }}
+                            style={input}
+                        >
+                            <option value="">Escolha a disciplina</option>
+                            {DISCIPLINAS_DISPONIVEIS.map(d => (
+                                <option key={d} value={d}>{d}</option>
+                            ))}
+                        </select>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '6px' }}>
+                            <div>
+                                <label style={labelSm}>Peso prova</label>
+                                <input type="number" min="0" max="10" step="0.5"
+                                    value={pesoProva}
+                                    onChange={e => handlePesoProva(e.target.value)}
+                                    style={input}
+                                />
                             </div>
-                        ))}
-                    </div>
+                            <div>
+                                <label style={labelSm}>Peso atividades</label>
+                                <input type="number" min="0" max="10" step="0.5"
+                                    value={pesoAtiv}
+                                    onChange={e => handlePesoAtiv(e.target.value)}
+                                    style={input}
+                                />
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>
+                            Soma: <strong style={{ color: Number(pesoProva) + Number(pesoAtiv) === 10 ? '#16a34a' : '#dc2626' }}>
+                                {(Number(pesoProva) + Number(pesoAtiv)).toFixed(1)}
+                            </strong> / 10
+                        </p>
+                        {erro && <p style={{ color: '#dc2626', fontSize: '12px', marginBottom: '8px' }}>{erro}</p>}
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
+                            <button onClick={onClose} style={btnSec}>Cancelar</button>
+                            <button onClick={adicionar} style={btnPrimary} disabled={loading || !disciplina}>
+                                {loading ? 'Salvando...' : 'Adicionar'}
+                            </button>
+                        </div>
+                    </>
+                ) : !editando ? (
+                    <>
+                        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <p style={{ margin: 0, fontWeight: '600', fontSize: '14px', color: '#15803d' }}>{cfg.disciplina}</p>
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#166534' }}>
+                                        Prova: {cfg.peso_prova} · Atividades: {cfg.peso_atividades}
+                                    </p>
+                                </div>
+                                <button onClick={iniciarEdicao} style={btnIcon}>
+                                    <EditarIcon />
+                                </button>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '12px', color: '#888', margin: '0 0 16px 0', textAlign: 'center' }}>
+                            Apenas uma disciplina pode ser configurada por turma
+                        </p>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <button onClick={onClose} style={btnPrimary}>Fechar</button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div style={{ background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+                            <p style={{ margin: 0, fontWeight: '600', fontSize: '14px', color: '#1e40af' }}>{cfg.disciplina}</p>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '6px' }}>
+                            <div>
+                                <label style={labelSm}>Peso prova</label>
+                                <input type="number" min="0" max="10" step="0.5"
+                                    value={pesoProva}
+                                    onChange={e => handlePesoProva(e.target.value)}
+                                    style={input}
+                                />
+                            </div>
+                            <div>
+                                <label style={labelSm}>Peso atividades</label>
+                                <input type="number" min="0" max="10" step="0.5"
+                                    value={pesoAtiv}
+                                    onChange={e => handlePesoAtiv(e.target.value)}
+                                    style={input}
+                                />
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>
+                            Soma: <strong style={{ color: Number(pesoProva) + Number(pesoAtiv) === 10 ? '#16a34a' : '#dc2626' }}>
+                                {(Number(pesoProva) + Number(pesoAtiv)).toFixed(1)}
+                            </strong> / 10
+                        </p>
+                        {erro && <p style={{ color: '#dc2626', fontSize: '12px', marginBottom: '8px' }}>{erro}</p>}
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
+                            <button onClick={() => setEditando(null)} style={btnSec}>Cancelar</button>
+                            <button onClick={salvarEdicao} style={btnPrimary} disabled={loading}>
+                                {loading ? 'Salvando...' : 'Salvar'}
+                            </button>
+                        </div>
+                    </>
                 )}
-
-                <div style={{ borderTop: cfgs.length > 0 ? '1px solid #eee' : 'none', paddingTop: cfgs.length > 0 ? '16px' : '0' }}>
-                    <p style={{ fontSize: '13px', fontWeight: '600', marginBottom: '10px' }}>Adicionar disciplina</p>
-                    <input
-                        placeholder="Nome da disciplina (ex: Matemática)"
-                        value={disciplina}
-                        onChange={e => { setDisciplina(e.target.value); setErro(''); }}
-                        style={input}
-                    />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '6px' }}>
-                        <div>
-                            <label style={labelSm}>Peso prova</label>
-                            <input type="number" min="0" max="10" step="0.5"
-                                value={pesoProva}
-                                onChange={e => handlePesoProva(e.target.value)}
-                                style={input}
-                            />
-                        </div>
-                        <div>
-                            <label style={labelSm}>Peso atividades</label>
-                            <input type="number" min="0" max="10" step="0.5"
-                                value={pesoAtiv}
-                                onChange={e => handlePesoAtiv(e.target.value)}
-                                style={input}
-                            />
-                        </div>
-                    </div>
-                    <p style={{ fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>
-                        Soma: <strong style={{ color: Number(pesoProva) + Number(pesoAtiv) === 10 ? '#16a34a' : '#dc2626' }}>
-                            {(Number(pesoProva) + Number(pesoAtiv)).toFixed(1)}
-                        </strong> / 10
-                    </p>
-                    {erro && <p style={{ color: '#dc2626', fontSize: '12px', marginBottom: '8px' }}>{erro}</p>}
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
-                    <button onClick={onClose} style={btnSec}>Fechar</button>
-                    <button onClick={adicionar} style={btnPrimary} disabled={loading}>
-                        {loading ? 'Salvando...' : 'Adicionar'}
-                    </button>
-                </div>
             </div>
         </div>
     );
